@@ -2,12 +2,12 @@ const { leagues } = require('../../domain/leagues');
 
 const leagueNames = new Map([
   ...[...leagues].map(([id, name]) => [name.toLowerCase(), id]),
-  ['ла лига', 140],
-  ['epl', 39],
-  ['апл', 39],
-  ['бундеслига', 78],
-  ['серия а', 135],
-  ['лига 1', 61],
+  ['ла лига', 'la-liga'],
+  ['epl', 'premier-league'],
+  ['апл', 'premier-league'],
+  ['бундеслига', 'bundesliga'],
+  ['серия а', 'serie-a'],
+  ['лига 1', 'ligue-1'],
 ]);
 
 function resolveLeagueId(text) {

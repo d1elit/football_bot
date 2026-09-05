@@ -18,8 +18,8 @@ function createBot({ token, getStandings }) {
   ));
   bot.command('leagues', showLeagues);
 
-  bot.action(/^league:(\d+)$/, async (ctx) => {
-    const leagueId = Number(ctx.match[1]);
+  bot.action(/^league:([a-z0-9-]+)$/, async (ctx) => {
+    const leagueId = ctx.match[1];
     if (!leagues.has(leagueId)) return ctx.answerCbQuery('Unknown league.');
 
     // Сразу убираем индикатор загрузки на кнопке, затем обращаемся к API.

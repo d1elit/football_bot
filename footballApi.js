@@ -3,7 +3,7 @@ const { createFootballApi } = require('./src/infrastructure/football/footballApi
 const { createGetStandings } = require('./src/application/getStandings');
 
 async function getStandings(leagueId) {
-  const footballApi = createFootballApi({ apiKey: process.env.FOOTBALL_API_KEY?.trim() });
+  const footballApi = createFootballApi({ apiKey: process.env.FOOTBALL_DATA_API_KEY?.trim() });
   return createGetStandings({ footballApi })(leagueId);
 }
 
