@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Context>
+
+title Telegram Football Bot - C4 Level 1: System Context
+LAYOUT_LEFT_RIGHT()
+
+Person(fan, "Football fan", "Chooses a supported league and views its standings in Telegram.")
+Person(operator, "Operator", "Runs the application and checks its HTTP process health.")
+
+System(bot, "Telegram Football Bot", "Provides league selection and football standings for the 2024/2025 season, plus help and text replies.")
+
+System_Ext(telegram, "Telegram", "Messaging platform that carries user commands, button selections, and bot replies.")
+System_Ext(football, "API-Football (API-SPORTS)", "Provides football league standings.")
+
+Rel(fan, telegram, "Sends commands and selects leagues; reads bot replies")
+Rel(operator, bot, "Checks HTTP process health", "HTTP /health")
+Rel(bot, telegram, "Receives updates through long polling and sends replies", "Telegram Bot API / HTTPS")
+Rel(bot, football, "Requests standings for the selected league and season", "HTTPS / JSON")
+
+SHOW_LEGEND()
+@enduml

@@ -14,6 +14,14 @@ The bot uses Telegram long polling. Send `/leagues` to choose Premier League, La
 
 ## Architecture
 
+C4 diagrams in PlantUML format:
+
+- [Level 1: System context](docs/c4-context.puml)
+- [Level 2: Containers](docs/c4-container.puml)
+- [Level 3: Components](docs/c4-component.puml)
+
+Render these files with PlantUML and its bundled C4 standard library. The application is one Node.js process containing both the Telegram bot and the HTTP health endpoint. The operator represents a person checking the existing health route; no external monitoring system is assumed.
+
 - `index.js`: entry point, environment loading, startup, and shutdown.
 - `src/config.js`: environment validation.
 - `src/createApp.js`: connects the use case and concrete adapters through dependency injection.

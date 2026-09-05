@@ -1,0 +1,22 @@
+@startuml
+!include <C4/C4_Container>
+
+title Telegram Football Bot - C4 Level 2: Containers
+LAYOUT_LEFT_RIGHT()
+
+Person(fan, "Football fan", "Chooses a league and views standings in Telegram.")
+Person(operator, "Operator", "Runs the application and checks its HTTP process health.")
+System_Ext(telegram, "Telegram", "Messaging platform and Bot API.")
+System_Ext(football, "API-Football (API-SPORTS)", "Provides football league standings.")
+
+System_Boundary(system, "Telegram Football Bot") {
+    Container(app, "Bot application", "Node.js / JavaScript, Telegraf, Fastify", "Handles Telegram commands and league selections, retrieves and formats standings, and exposes an HTTP health endpoint.")
+}
+
+Rel(fan, telegram, "Sends commands and selects leagues; reads replies")
+Rel(app, telegram, "Receives updates through long polling and sends replies", "Telegram Bot API / HTTPS")
+Rel(app, football, "Requests league standings for season 2024", "HTTPS / JSON")
+Rel(operator, app, "Checks HTTP process health", "HTTP GET /health")
+
+SHOW_LEGEND()
+@enduml

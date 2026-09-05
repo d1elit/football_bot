@@ -1,0 +1,35 @@
+@startuml
+!include <C4/C4_Component>
+
+title Telegram Football Bot - C4 Level 3: Bot Application Components
+LAYOUT_LEFT_RIGHT()
+
+Person(operator, "Operator", "Runs the application and checks its HTTP process health.")
+System_Ext(telegram, "Telegram", "Messaging platform and Bot API.")
+System_Ext(football, "API-Football (API-SPORTS)", "Provides football league standings.")
+
+Container_Boundary(app, "Bot application - Node.js process") {
+    Component(bootstrap, "Application bootstrap", "index.js, src/config.js, src/createApp.js", "Loads and validates configuration, wires dependencies, starts HTTP and polling, and coordinates shutdown.")
+    Component(bot, "Telegram interface", "Telegraf / src/presentation/telegram/createBot.js", "Handles commands, league buttons, text echoes, and user-facing failures.")
+    Component(formatter, "Standings formatter", "src/presentation/telegram/formatStandings.js", "Formats escaped HTML tables and splits long replies.")
+    Component(usecase, "Get standings", "src/application/getStandings.js", "Validates league selection, requests season 2024, and sorts standings by rank.")
+    Component(leagues, "Supported leagues", "src/domain/leagues.js", "Defines the five supported league IDs and names.")
+    Component(adapter, "Football API adapter", "src/infrastructure/football/footballApi.js / fetch", "Authenticates requests, enforces timeouts, validates and maps responses, and logs API failures.")
+    Component(health, "HTTP health interface", "Fastify / src/presentation/http/createServer.js", "Serves GET /health with process status; does not check external services.")
+}
+
+Rel(bootstrap, bot, "Creates, starts, and stops")
+Rel(bootstrap, health, "Creates and starts; registers shutdown hook")
+Rel(bootstrap, usecase, "Creates with injected API adapter")
+Rel(bootstrap, adapter, "Creates with configured API key")
+Rel(bot, telegram, "Long-polls updates and sends replies", "Telegram Bot API / HTTPS")
+Rel(bot, usecase, "Requests standings for selected league")
+Rel(bot, formatter, "Formats standings into reply messages")
+Rel(bot, leagues, "Builds league buttons and resolves names")
+Rel(usecase, leagues, "Validates supported league")
+Rel(usecase, adapter, "Calls injected getStandings(leagueId, season)")
+Rel(adapter, football, "Fetches standings", "HTTPS GET /standings / JSON")
+Rel(operator, health, "Checks HTTP process health", "HTTP GET /health")
+
+SHOW_LEGEND()
+@enduml

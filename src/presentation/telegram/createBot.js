@@ -1,6 +1,7 @@
 const { Telegraf, Markup } = require('telegraf');
 const { message } = require('telegraf/filters');
 const { leagues } = require('../../domain/leagues');
+const { formatStandings } = require('./formatStandings');
 
 // Telegram получает сценарий через аргумент, не создавая API-клиент.
 function createBot({ token, getStandings }) {
@@ -29,20 +30,9 @@ function createBot({ token, getStandings }) {
       return ctx.reply('Текущая турнирная таблица для этой лиги пока недоступна.');
     }
 
-    const heading = `${leagues.get(leagueId)} — ${standings.season}/${standings.season + 1}\nПоз. Команда — И | РМ | Очки`;
-    const rows = standings.table.map((row) =>
-      `${row.rank}. ${row.team.name} — ${row.all.played} | ${row.goalsDiff} | ${row.points}`
-    );
-    // Делим длинный ответ на сообщения с учётом лимита Telegram.
-    let text = heading;
-    for (const row of rows) {
-      if (text.length + row.length + 1 > 4000) {
-        await ctx.reply(text);
-        text = heading;
-      }
-      text += `\n${row}`;
+    for (const text of formatStandings(leagues.get(leagueId), standings)) {
+      await ctx.reply(text, { parse_mode: 'HTML' });
     }
-    await ctx.reply(text);
   });
 
   // Сохраняем эхо для обычных текстовых сообщений.
