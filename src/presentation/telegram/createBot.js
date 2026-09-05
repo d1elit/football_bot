@@ -16,8 +16,21 @@ const leagueNames = new Map([
 // Telegram получает сценарий через аргумент, не создавая API-клиент.
 function createBot({ token, getStandings }) {
   const bot = new Telegraf(token);
-  bot.start((ctx) => ctx.reply('Привет! используй команду /leagues чтобы увидеть список европейских топ лиг.'));
-  bot.help((ctx) => ctx.reply('Используй /leagues, после чего выбери лигу и увидишь состояние турнирной таблицы за 2024 год.'));
+  const leagueHints = [
+    'Напиши название лиги в поле сообщения — и я покажу турнирную таблицу за сезон 2024/2025.',
+    '',
+    'Можно отправить любой из вариантов:',
+    '• апл, EPL или Premier League',
+    '• ла лига или La Liga',
+    '• бундеслига или Bundesliga',
+    '• серия а или Serie A',
+    '• лига 1 или Ligue 1',
+    '',
+    'Например, отправь: апл',
+    'Или используй /leagues, чтобы выбрать лигу кнопкой.',
+  ].join('\n');
+  bot.start((ctx) => ctx.reply(`Привет! ⚽\n\n${leagueHints}`));
+  bot.help((ctx) => ctx.reply(leagueHints));
 
   // Каждая кнопка передаёт идентификатор лиги в callback_data.
   const showLeagues = (ctx) => ctx.reply('Выбери чемпионат:', Markup.inlineKeyboard(
