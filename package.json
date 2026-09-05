@@ -2,13 +2,18 @@
   "name": "telegram-bot",
   "version": "1.0.0",
   "private": true,
-  "description": "Minimal JavaScript Telegram bot using Telegraf",
+  "description": "Telegram football bot with Fastify and clean architecture",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
+    "fastify": "^5.12.3",
     "telegraf": "^4.16.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
