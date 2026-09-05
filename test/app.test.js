@@ -64,9 +64,12 @@ test('Fastify health endpoint responds without Telegram or external requests', a
 
 test('Telegram keyboard and callbacks use the injected standings scenario', async () => {
   let fail = false;
+  let unavailable = false;
+  let expectedId = 39;
   const bot = createBot({ token: 'test', getStandings: async (id) => {
-    assert.equal(id, 39);
+    assert.equal(id, expectedId);
     if (fail) throw new Error('Offline');
+    if (unavailable) return null;
     return { season: 2024, table: [{ rank: 1, team: { name: 'Test FC' }, all: { played: 3 }, goalsDiff: 5, points: 9 }] };
   } });
   bot.botInfo = { id: 1, is_bot: true, username: 'test_bot', first_name: 'Test' };
@@ -90,6 +93,38 @@ test('Telegram keyboard and callbacks use the injected standings scenario', asyn
     await bot.handleUpdate(callback);
     assert.equal(sent[4].method, 'sendMessage');
     assert.doesNotMatch(sent[4].payload.text, /Test FC/);
+
+    const sendText = (text) => bot.handleUpdate({ update_id: 3, message: { ...message, text, entities: [] } });
+    await sendText('EPL');
+    assert.deepEqual(sent.at(-1), sent[4]);
+    fail = false;
+
+    for (const [name, id] of [
+      ['La Liga', 140], ['ла лига', 140], ['EPL', 39], ['АПЛ', 39],
+      ['Premier League', 39], ['Bundesliga', 78], ['бундеслига', 78],
+      ['Serie A', 135], ['серия а', 135], ['Ligue 1', 61], ['лига 1', 61],
+      ['  pReMiEr   LEAGUE  ', 39], ['  ЛА   ЛИГА  ', 140],
+    ]) {
+      expectedId = id;
+      await bot.handleUpdate({ ...callback, callback_query: { ...callback.callback_query, data: `league:${id}` } });
+      const buttonReply = sent.at(-1);
+      const count = sent.length;
+      await sendText(name);
+      assert.equal(sent.length, count + 1);
+      assert.deepEqual(sent.at(-1), buttonReply);
+    }
+
+    unavailable = true;
+    expectedId = 39;
+    await bot.handleUpdate(callback);
+    const unavailableReply = sent.at(-1);
+    await sendText('АПЛ');
+    assert.deepEqual(sent.at(-1), unavailableReply);
+
+    for (const text of ['hello', 'Premier League news', '   ']) {
+      await sendText(text);
+      assert.deepEqual(sent.at(-1), sent[0]);
+    }
   } finally {
     Telegram.prototype.callApi = original;
   }
